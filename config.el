@@ -86,3 +86,4 @@
                             "*Elefantito de Simón triste*"))        
 
 (add-to-list 'auto-mode-alist '("\\.yuck\\'" . lisp-mode))
+(setq doom-themes-treemacs-theme "doom-colors")
