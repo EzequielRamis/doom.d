@@ -14,6 +14,8 @@
 ;;      Alternatively, press 'gd' (or 'C-c c d') on a module to browse its
 ;;      directory (for easy access to its source code).
 
+(setq evil-respect-visual-line-mode t)
+
 (doom! :input
        ;;chinese
        ;;japanese
@@ -146,7 +148,7 @@
        ;;lean              ; for folks with too much to prove
        ;;ledger            ; be audit you can be
        ;;lua               ; one-based indices? one-based indices
-       markdown          ; writing docs for people to ignore
+       (markdown +grip)          ; writing docs for people to ignore
        ;;nim               ; python + lisp at the speed of c
        nix               ; I hereby declare "nix geht mehr!"
        ;;ocaml             ; an objective camel
