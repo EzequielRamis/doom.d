@@ -26,7 +26,28 @@
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
 ;; `load-theme' function. This is the default:
-(setq doom-theme 'doom-one)
+(defun theme-is-dark-p ()
+  (car (read-from-string
+        (shell-command-to-string "theme_is_dark && echo -n t || echo -n nil"))))
+
+(defun sync-theme-light ()
+  (setq doom-theme 'theme-light)
+  (doom-init-theme-h))
+(defun sync-theme-dark ()
+  (setq doom-theme 'theme-dark)
+  (doom-init-theme-h))
+
+(add-load-path! "theme")
+(if (file-exists-p "~/.local/share/dotfiles/palette.el")
+;; (if nil
+  (progn
+    (load-file "~/.local/share/dotfiles/palette.el")
+    (require 'load-directory)
+    (load-directory "~/.doom.d/theme")
+    (if (theme-is-dark-p)
+     (setq doom-theme 'theme-dark)
+     (setq doom-theme 'theme-light)))
+  (setq doom-theme 'doom-one))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
