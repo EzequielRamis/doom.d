@@ -39,7 +39,7 @@
 
 (add-load-path! "theme")
 (if (file-exists-p "~/.local/share/dotfiles/palette.el")
-;; (if nil
+ (if nil
   (progn
     (load-file "~/.local/share/dotfiles/palette.el")
     (require 'load-directory)
@@ -47,7 +47,7 @@
     (if (theme-is-dark-p)
      (setq doom-theme 'theme-dark)
      (setq doom-theme 'theme-light)))
-  (setq doom-theme 'doom-one))
+  (setq doom-theme 'doom-one)))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
