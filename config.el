@@ -31,23 +31,20 @@
         (shell-command-to-string "theme_is_dark && echo -n t || echo -n nil"))))
 
 (defun sync-theme-light ()
-  (setq doom-theme 'theme-light)
+  (setq doom-theme 'mylight)
   (doom-init-theme-h))
 (defun sync-theme-dark ()
-  (setq doom-theme 'theme-dark)
+  (setq doom-theme 'mydark)
   (doom-init-theme-h))
 
-(add-load-path! "theme")
-(if (file-exists-p "~/.local/share/dotfiles/palette.el")
- (if nil
-  (progn
-    (load-file "~/.local/share/dotfiles/palette.el")
-    (require 'load-directory)
-    (load-directory "~/.doom.d/theme")
-    (if (theme-is-dark-p)
-     (setq doom-theme 'theme-dark)
-     (setq doom-theme 'theme-light)))
-  (setq doom-theme 'doom-one)))
+(add-load-path! "~/.local/share/dotfiles")
+(require 'dash)
+(if (and (-contains-p (custom-available-themes) 'mydark)
+         (-contains-p (custom-available-themes) 'mylight))
+  (if (theme-is-dark-p)
+    (setq doom-theme 'mydark)
+    (setq doom-theme 'mylight))
+ (setq doom-theme 'doom-one))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
