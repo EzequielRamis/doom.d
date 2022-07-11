@@ -58,4 +58,10 @@
    (vc-deleted   red))
 
   ((lsp-face-highlight-textual :background base2 :foreground fg-alt :distant-background bg-alt)
-   (cursor :background blue)))
+   (cursor :background blue)
+   (diff-removed                    :foreground red :background palette1F)
+   (diff-indicator-removed          :foreground red :background palette1E)
+   (magit-diff-removed              :foreground red :background palette1F)
+   (magit-diff-our-highlight        :foreground red :background palette1E :weight 'bold)
+   (magit-diff-removed-highlight    :foreground red :background palette1E :weight 'bold)
+   (diff-refine-removed             :foreground bg-alt :background red :weight 'bold)))
