@@ -68,4 +68,5 @@
    (magit-diff-our-highlight        :foreground red :background palette11 :weight 'bold)
    (magit-diff-removed-highlight    :foreground red :background palette11 :weight 'bold)
    (diff-refine-removed             :foreground bg-alt :background red :weight 'bold)
-   (vterm-color-black               :foreground base6 :background base5)))
+   (vterm-color-black               :foreground base6 :background base5)
+   (whitespace-tab                  :foreground base2 :background bg)))

@@ -64,4 +64,5 @@
    (magit-diff-removed              :foreground red :background palette1F)
    (magit-diff-our-highlight        :foreground red :background palette1E :weight 'bold)
    (magit-diff-removed-highlight    :foreground red :background palette1E :weight 'bold)
-   (diff-refine-removed             :foreground bg-alt :background red :weight 'bold)))
+   (diff-refine-removed             :foreground bg-alt :background red :weight 'bold)
+   (whitespace-tab                  :foreground base3 :background bg)))
