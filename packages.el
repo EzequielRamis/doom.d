@@ -48,3 +48,8 @@
 ;(unpin! pinned-package another-pinned-package)
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
+
+;; astro
+(package! poly-markdown)
+(package! poly-astro
+  :recipe (:host github :repo "pablo-abc/poly-astro"))

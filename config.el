@@ -168,3 +168,6 @@
   (when (boundp 'persp-names-cache)
     (+workspace/delete (car (last (+workspace-list-names))))))
 ;; NOTE End - Daemon fixes
+
+(require 'poly-astro)
+(add-to-list 'auto-mode-alist '("\\.astro\\'" . poly-astro))
