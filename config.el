@@ -176,7 +176,10 @@
 
 (add-to-list 'auto-mode-alist '("\\.txt\\'" . markdown-mode))
 
+(defun nolinum ()
+  (setq display-line-numbers nil))
+
 (add-hook! '(markdown-mode-hook org-mode-hook)
-           '(visual-fill-column-mode menu-bar--display-line-numbers-mode-none variable-pitch-mode))
+           '(visual-fill-column-mode nolinum variable-pitch-mode))
 
 (setq-default visual-fill-column-center-text t)
