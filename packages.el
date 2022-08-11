@@ -53,3 +53,5 @@
 (package! poly-markdown)
 (package! poly-astro
   :recipe (:host github :repo "pablo-abc/poly-astro"))
+
+(package! visual-fill-column)

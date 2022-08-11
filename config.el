@@ -20,8 +20,8 @@
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
 (setq doom-font (font-spec :family "SFMono Nerd Font" :size 18)
-      doom-emoji-fallback-font-families '("Twitter Color Emoji"))
-;;       doom-variable-pitch-font (font-spec :family "sans" :size 13))
+      doom-emoji-fallback-font-families '("Twitter Color Emoji")
+      doom-variable-pitch-font (font-spec :family "sans" :size 20))
 
 ;; There are two ways to load a theme. Both assume the theme is installed and
 ;; available. You can either set `doom-theme' or manually load a theme with the
@@ -171,3 +171,10 @@
 
 (require 'poly-astro)
 (add-to-list 'auto-mode-alist '("\\.astro\\'" . poly-astro))
+
+(add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))
+
+(add-hook! '(text-mode-hook)
+           '(visual-fill-column-mode menu-bar--display-line-numbers-mode-none variable-pitch-mode))
+
+(setq-default visual-fill-column-center-text t)
