@@ -174,7 +174,9 @@
 
 (add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))
 
-(add-hook! '(text-mode-hook)
+(add-to-list 'auto-mode-alist '("\\.txt\\'" . markdown-mode))
+
+(add-hook! '(markdown-mode-hook org-mode-hook)
            '(visual-fill-column-mode menu-bar--display-line-numbers-mode-none variable-pitch-mode))
 
 (setq-default visual-fill-column-center-text t)
