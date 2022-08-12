@@ -172,14 +172,10 @@
 (require 'poly-astro)
 (add-to-list 'auto-mode-alist '("\\.astro\\'" . poly-astro))
 
+;; text modes
 (add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))
 
-(add-to-list 'auto-mode-alist '("\\.txt\\'" . markdown-mode))
-
-(defun nolinum ()
-  (setq display-line-numbers nil))
-
-(add-hook! '(markdown-mode-hook org-mode-hook)
-           '(visual-fill-column-mode nolinum variable-pitch-mode))
+(add-hook!    '(text-mode-hook) '(visual-fill-column-mode variable-pitch-mode))
+(remove-hook! '(text-mode-hook) '(display-line-numbers-mode))
 
 (setq-default visual-fill-column-center-text t)
