@@ -169,13 +169,65 @@
     (+workspace/delete (car (last (+workspace-list-names))))))
 ;; NOTE End - Daemon fixes
 
+;; from https://github.com/idris-community/idris2-mode
+(add-load-path! "~/.emacs.d/idris2-mode/")
+(require 'idris2-mode)
+
+;; Fixes lag when editing idris code with evil
+(defun ~/evil-motion-range--wrapper (fn &rest args)
+  "Like `evil-motion-range', but override field-beginning for performance.
+See URL `https://github.com/ProofGeneral/PG/issues/427'."
+  (cl-letf (((symbol-function 'field-beginning)
+             (lambda (&rest args) 1)))
+    (apply fn args)))
+(advice-add #'evil-motion-range :around #'~/evil-motion-range--wrapper)
+
 (require 'poly-astro)
+(defun astro-mode (&optional arg)
+  (setq tab-width 4))
+
 (add-to-list 'auto-mode-alist '("\\.astro\\'" . poly-astro))
+(add-to-list 'auto-minor-mode-alist '("\\.astro\\'" . astro-mode))
+
+;; fix for <style is:global> case
+(define-auto-innermode poly-astro-style-tag-lang-innermode
+  :head-matcher "<[[:space:]]*style[[:space:]]*.*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*.*>\n"
+  :tail-matcher "</[[:space:]]*style[[:space:]]*[[:space:]]*>"
+  :mode-matcher (cons  "<[[:space:]]*style[[:space:]]*.*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*.*>" 1)
+  :head-mode 'host
+  :tail-mode 'host
+  :body-indent-offset 2)
+
+(define-innermode poly-astro-script-innermode
+  :mode 'js-mode
+  :head-matcher "<[[:space:]]*script[[:space:]]*.*[[:space:]]*>\n"
+  :tail-matcher "</[[:space:]]*script[[:space:]]*.*[[:space:]]*>"
+  :head-mode 'host
+  :tail-mode 'host
+  :body-indent-offset 2)
+
+(define-polymode poly-astro
+  :hostmode 'poly-astro-hostmode
+  :innermodes '(poly-astro-fm-innermode
+                poly-astro-style-tag-lang-innermode
+                poly-astro-style-innermode
+                poly-astro-script-innermode))
 
 ;; text modes
-(add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))
+(defun nolinum (&optional arg)
+  (setq display-line-numbers nil))
 
-(add-hook!    '(text-mode-hook) '(visual-fill-column-mode variable-pitch-mode))
-(remove-hook! '(text-mode-hook) '(display-line-numbers-mode))
+(defun txt-mode (&optional arg)
+  (nolinum)
+  (visual-fill-column-mode)
+  (variable-pitch-mode))
+
+(add-hook!    '(markdown-mode-hook)               '(markdown-bullets-mode))
+(add-hook!    '(markdown-mode-hook org-mode-hook) '(nolinum visual-fill-column-mode variable-pitch-mode valign-mode))
 
 (setq-default visual-fill-column-center-text t)
+
+(add-to-list 'auto-mode-alist '("\\.mdx\\'" . markdown-mode))
+(add-to-list 'auto-minor-mode-alist '("\\.txt\\'" . txt-mode))
+
+(setq vterm-clear-scrollback-when-clearing t)

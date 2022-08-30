@@ -49,9 +49,15 @@
 ;; ...Or *all* packages (NOT RECOMMENDED; will likely break things)
 ;(unpin! t)
 
+(package! idris2-mode :recipe (:host github :repo "idris-community/idris2-mode"))
+
 ;; astro
 (package! poly-markdown)
 (package! poly-astro
   :recipe (:host github :repo "pablo-abc/poly-astro"))
 
 (package! visual-fill-column)
+
+(package! markdown-bullets :recipe (:host github :repo "xuchunyang/markdown-bullets"))
+
+(package! valign)
