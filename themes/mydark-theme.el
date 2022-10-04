@@ -85,4 +85,6 @@
    (org-table-header                 :inherit 'fixed-pitch :foreground builtin)
    (org-meta-line                    :foreground comments)
    (org-tag                          :inherit 'fixed-pitch :foreground doc-comments)
-   (org-tag-group                    :inherit 'fixed-pitch :foreground doc-comments)))
+   (org-tag-group                    :inherit 'fixed-pitch :foreground doc-comments)
+   (line-number                      :foreground base4)
+   (line-number-current-line         :foreground fg)))

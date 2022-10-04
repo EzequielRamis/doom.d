@@ -61,3 +61,10 @@
 (package! markdown-bullets :recipe (:host github :repo "xuchunyang/markdown-bullets"))
 
 (package! valign)
+
+(package! pdf-tools :type 'built-in :built-in 'prefer)
+(package! saveplace-pdf-view)
+
+(package! pdf-continuous-scroll-mode :recipe
+          (:host github
+                 :repo "dalanicolai/pdf-continuous-scroll-mode.el"))
