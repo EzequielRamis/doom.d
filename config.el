@@ -343,8 +343,7 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
 
 (setq-default TeX-master 'shared)
 
-(setq TeX-view-program-selection '((output-pdf "PDF Tools"))
-      ;; TeX-view-program-list '(("PDF Tools" TeX-pdf-tools-sync-view))
+(setq TeX-view-program-selection '((output-pdf "Zathura"))
       TeX-source-correlate-start-server t)
 
 (add-hook 'TeX-after-compilation-finished-functions
