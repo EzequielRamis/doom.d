@@ -164,9 +164,22 @@
 ;; NOTE End - Haskell fixes
 
 ;; NOTE Begin - Daemon fixes
-(defun fix-workspace-mod ()
-  (when (boundp 'persp-names-cache)
-    (+workspace/delete (car (last (+workspace-list-names))))))
+(eval-after-load "workspaces"
+ '(defun +workspaces-associate-frame-fn (frame &optional _new-frame-p)
+   "Create a blank, new perspective and associate it with FRAME."
+   (when persp-mode
+     (if (not (persp-frame-list-without-daemon))
+      (+workspace-switch +workspaces-main t)
+      (with-selected-frame frame
+        (print (car (+workspace-list-names)))
+        ;; (+workspace-switch (format "#%s" (+workspace--generate-id)) t)
+        (+workspace-switch (car (+workspace-list-names)) t)
+        (unless (doom-real-buffer-p (current-buffer))
+          (switch-to-buffer (doom-fallback-buffer)))
+        (set-frame-parameter frame 'workspace (+workspace-current-name))
+        ;; ensure every buffer has a buffer-predicate
+        (persp-set-frame-buffer-predicate frame))
+      (run-at-time 0.1 nil #'+workspace/display)))))
 ;; NOTE End - Daemon fixes
 
 ;; from https://github.com/idris-community/idris2-mode
@@ -356,3 +369,4 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
 
 ;; (require 'pdf-continuous-scroll-mode)
 ;; (setq pdf-continuous-suppress-introduction t)
+(setq which-key-allow-imprecise-window-fit nil)
