@@ -385,3 +385,18 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
             ;;   ✸
             (compose-region end-1 end (markdown-bullets--level-char (- end beg)))
             (compose-region beg end-1 (string-to-char " "))))))))
+
+(setq-default evil-kill-on-visual-paste nil)
+
+(defun evil-change-from-nil ()
+  (interactive)
+  (let ((evil-this-register ?_))
+    (call-interactively 'evil-change)))
+
+(defun evil-change-line-from-nil ()
+  (interactive)
+  (let ((evil-this-register ?_))
+    (call-interactively 'evil-change-line)))
+
+(define-key evil-normal-state-map (kbd "c") 'evil-change-from-nil)
+(define-key evil-normal-state-map (kbd "C") 'evil-change-line-from-nil)
