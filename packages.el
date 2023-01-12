@@ -51,11 +51,6 @@
 
 (package! idris2-mode :recipe (:host github :repo "idris-community/idris2-mode"))
 
-;; astro
-(package! poly-markdown)
-(package! poly-astro
-  :recipe (:host github :repo "pablo-abc/poly-astro"))
-
 (package! visual-fill-column)
 
 (package! markdown-bullets :recipe (:host github :repo "xuchunyang/markdown-bullets"))
@@ -64,3 +59,8 @@
 
 (package! pdf-tools :type 'built-in :built-in 'prefer)
 (package! saveplace-pdf-view)
+
+(package! copilot
+  :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
+
+(package! ligature :recipe (:host github :repo "mickeynp/ligature.el"))

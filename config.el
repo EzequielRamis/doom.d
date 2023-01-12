@@ -19,7 +19,7 @@
 ;;
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
-(setq doom-font (font-spec :family "SFMono Nerd Font" :size 18)
+(setq doom-font (font-spec :family "LigaSF Mono Nerd Font" :size 18)
       doom-emoji-fallback-font-families '("Twitter Color Emoji")
       doom-variable-pitch-font (font-spec :family "sans" :size 20))
 
@@ -195,37 +195,6 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
     (apply fn args)))
 (advice-add #'evil-motion-range :around #'~/evil-motion-range--wrapper)
 
-(require 'poly-astro)
-(defun astro-mode (&optional arg)
-  (setq tab-width 4))
-
-;; (add-to-list 'auto-mode-alist '("\\.astro\\'" . poly-astro))
-;; (add-to-list 'auto-minor-mode-alist '("\\.astro\\'" . astro-mode))
-
-;; fix for <style is:global> case
-(define-auto-innermode poly-astro-style-tag-lang-innermode
-  :head-matcher "<[[:space:]]*style[[:space:]]*.*lang=[[:space:]]*[\"'][[:space:]]*[[:alpha:]]+[[:space:]]*[\"'][[:space:]]*.*>\n"
-  :tail-matcher "</[[:space:]]*style[[:space:]]*[[:space:]]*>"
-  :mode-matcher (cons  "<[[:space:]]*style[[:space:]]*.*lang=[[:space:]]*[\"'][[:space:]]*\\([[:alpha:]]+\\)[[:space:]]*[\"'][[:space:]]*.*>" 1)
-  :head-mode 'host
-  :tail-mode 'host
-  :body-indent-offset 2)
-
-(define-innermode poly-astro-script-innermode
-  :mode 'js-mode
-  :head-matcher "<[[:space:]]*script[[:space:]]*.*[[:space:]]*>\n"
-  :tail-matcher "</[[:space:]]*script[[:space:]]*.*[[:space:]]*>"
-  :head-mode 'host
-  :tail-mode 'host
-  :body-indent-offset 2)
-
-(define-polymode poly-astro
-  :hostmode 'poly-astro-hostmode
-  :innermodes '(poly-astro-fm-innermode
-                poly-astro-style-tag-lang-innermode
-                poly-astro-style-innermode
-                poly-astro-script-innermode))
-
 ;; text modes
 (defun nolinum (&optional arg)
   (setq display-line-numbers nil))
@@ -240,13 +209,14 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
       markdown-command "markdown | smartypants")
 
 (add-hook!    '(markdown-mode-hook)               '(markdown-bullets-mode))
-(add-hook!    '(markdown-mode-hook org-mode-hook) '(nolinum visual-fill-column-mode variable-pitch-mode valign-mode))
+(add-hook!    '(markdown-mode-hook org-mode-hook) '(nolinum visual-fill-column-mode valign-mode))
+;; (add-hook!    '(markdown-mode-hook org-mode-hook) '(nolinum visual-fill-column-mode variable-pitch-mode valign-mode))
 
 (setq-default visual-fill-column-center-text t)
 
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
 (add-to-list 'auto-mode-alist '("\\.mdx\\'" . gfm-mode))
-(add-to-list 'auto-minor-mode-alist '("\\.txt\\'" . txt-mode))
+;; (add-to-list 'auto-minor-mode-alist '("\\.txt\\'" . txt-mode))
 
 (setq vterm-clear-scrollback-when-clearing t)
 
@@ -379,12 +349,13 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
   '(("^\\(#+\\) "
      (1 (prog1 nil
           (let* ((beg (match-beginning 1))
-                 (end (match-end 1))
-                 (end-1 (1- end)))
+                 (end (match-end 1)))
+                 ;; (end-1 (1- end)))
             ;; ### Heading 3
             ;;   ✸
-            (compose-region end-1 end (markdown-bullets--level-char (- end beg)))
-            (compose-region beg end-1 (string-to-char " "))))))))
+            (compose-region beg end (markdown-bullets--level-char (- end beg)))))))))
+            ;; (compose-region end-1 end (markdown-bullets--level-char (- end beg)))
+            ;; (compose-region beg end-1 (string-to-char " "))))))))
 
 (setq-default evil-kill-on-visual-paste nil)
 
@@ -398,5 +369,125 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
   (let ((evil-this-register ?_))
     (call-interactively 'evil-change-line)))
 
-(define-key evil-normal-state-map (kbd "c") 'evil-change-from-nil)
-(define-key evil-normal-state-map (kbd "C") 'evil-change-line-from-nil)
+(map! :n "c" #'evil-change-from-nil)
+(map! :n "C" #'evil-change-line-from-nil)
+(map! :i "C-v" #'yank)
+
+(map! :map 'gfm-mode-map :m "g TAB" 'markdown-up-list)
+
+(setq lsp-enable-suggest-server-download nil)
+
+(setq web-mode-enable-front-matter-block t)
+(define-derived-mode astro-mode web-mode "astro")
+(setq auto-mode-alist
+      (append '((".*\\.astro\\'" . astro-mode))
+              auto-mode-alist))
+
+;;   (lsp-register-client
+;;    (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls" "--stdio"))
+;;                     :activation-fn (lsp-activate-on "astro")
+;;                     :server-id 'astro-ls)))
+
+(require 'lsp-mode)
+
+(add-to-list 'lsp-language-id-configuration
+        '(astro-mode . "astro"))
+
+(defun lsp-astro--get-initialization-options ()
+  "Try to get the typescript server path, to supply to the astro language server."
+  (let ((library (f-join (lsp-workspace-root) "node_modules/typescript/lib/tsserverlibrary.js")))
+    (if (file-exists-p library)
+        `(:typescript (:serverPath ,library))
+      (lsp-warn "Unable to find typescript server path for astro-ls. Guessed: %s" library))))
+
+(defgroup lsp-astro nil
+  "LSP support for Astro.build, using astro-ls."
+  :group 'lsp-mode
+  :link '(url-link "https://github.com/withastro/language-tools"))
+
+(lsp-register-client
+ (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls" "--stdio"))
+                  :activation-fn (lsp-activate-on "astro")
+                  :initialization-options #'lsp-astro--get-initialization-options
+                  :server-id 'astro-ls))
+
+
+
+(lsp-consistency-check lsp-astro)
+
+(add-hook 'astro-mode-hook #'lsp-deferred)
+
+;; accept completion from copilot and fallback to company
+(use-package! copilot
+  :hook (prog-mode . copilot-mode)
+  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
+         ("C-<tab>" . 'copilot-accept-completion-by-word)
+         :map copilot-completion-map
+         ("<tab>" . 'copilot-accept-completion)
+         ("TAB" . 'copilot-accept-completion)))
+
+(after! company
+    (define-key company-active-map (kbd "TAB") nil)
+    (define-key company-active-map (kbd "<tab>") nil)
+    (define-key company-active-map (kbd "<backtab>") nil))
+
+(add-hook 'prog-mode-hook 'ligature-mode)
+
+(after! ligature
+  ;; Enable all Cascadia and Fira Code ligatures in programming modes
+  (ligature-set-ligatures 'prog-mode
+                        '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
+                          ;; =:= =!=
+                          ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
+                          ;; ;; ;;;
+                          (";" (rx (+ ";")))
+                          ;; && &&&
+                          ("&" (rx (+ "&")))
+                          ;; !! !!! !. !: !!. != !== !~
+                          ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
+                          ;; ?? ??? ?:  ?=  ?.
+                          ("?" (rx (or ":" "=" "\." (+ "?"))))
+                          ;; %% %%%
+                          ("%" (rx (+ "%")))
+                          ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
+                          ;; |->>-||-<<-| |- |== ||=||
+                          ;; |==>>==<<==<=>==//==/=!==:===>
+                          ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
+                                          "-" "="))))
+                          ;; \\ \\\ \/
+                          ("\\" (rx (or "/" (+ "\\"))))
+                          ;; ++ +++ ++++ +>
+                          ("+" (rx (or ">" (+ "+"))))
+                          ;; :: ::: :::: :> :< := :// ::=
+                          (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
+                          ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
+                          ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
+                                          "="))))
+                          ;; .. ... .... .= .- .? ..= ..<
+                          ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
+                          ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
+                          ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
+                          ;; *> */ *)  ** *** ****
+                          ("*" (rx (or ">" "/" ")" (+ "*"))))
+                          ;; www wwww
+                          ("w" (rx (+ "w")))
+                          ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
+                          ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
+                          ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
+                          ;; << <<< <<<<
+                          ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
+                                          "-"  "/" "|" "="))))
+                          ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
+                          ;; >> >>> >>>>
+                          (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
+                          ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
+                          ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
+                                       (+ "#"))))
+                          ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
+                          ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
+                          ;; __ ___ ____ _|_ __|____|_
+                          ("_" (rx (+ (or "_" "|"))))
+                          ;; Fira code: 0xFF 0x12
+                          ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
+                          ;; The few not covered by the regexps.
+                          "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^=")))
