@@ -102,7 +102,17 @@
                             "Saludos desde Nueva York, Mica Bezona."
                             "*Toma mate, luego de una pausa* ¿Qué me importa? *Toma mate de vuelta*"
                             "A llorar a la llorería."
-                            "*Elefantito de Simón triste*"))        
+                            "*Elefantito de Simón triste*"))
+
+(setq lsp-enable-suggest-server-download nil)
+
+(load! "haskell")
+(load! "idris")
+(load! "ligatures")
+(load! "copilot")
+(load! "markdown")
+(load! "web")
+(load! "pdf")
 
 ;; NOTE Begin - Treemacs icons fix
 (setq doom-themes-treemacs-theme "doom-colors")
@@ -111,57 +121,6 @@
 ;; NOTE Begin - Lisp dialects without lisp-mode
 (add-to-list 'auto-mode-alist '("\\.yuck\\'" . lisp-mode))
 ;; NOTE End - Lisp dialects without lisp-mode
-
-;; NOTE Begin - Haskell fixes
-
-;; fix to .cabal from https://github.com/doomemacs/doomemacs/issues/5147#issuecomment-874682852
-;; (after! format-all
-;;    (advice-add 'format-all-buffer :around #'envrc-propagate-environment))
-
-;; from https://github.com/ch1bo/dotfiles/blob/master/emacs/doom.d/config.el
-;; https://github.com/haskell/haskell-language-server/issues/2457
-(after! lsp-haskell (add-to-list 'lsp-haskell-server-args "-j2"))
-
-;; TODO(SN): this is necessary as format-all-mode / format-all-buffer--from-hook
-;; advice is not :override and had been broken the +onsave feature. So waiting
-;; for that :editor format rewrite...
-(defun add-autoformat-hook ()
-  (add-hook 'before-save-hook '+format-buffer-h nil 'local))
-(add-hook! (haskell-mode haskell-cabal-mode) 'add-autoformat-hook)
-
-;; Configure formatter when using +format-with-lsp
-;;
-;; NOTE This is intentionally set early, as options are only picked up by the
-;; haskell LS when (re-)starting.
-;; (setq lsp-haskell-formatting-provider "stylish-haskell")
-;; (setq lsp-haskell-formatting-provider "brittany")
-;; (setq lsp-haskell-formatting-provider "none")
-(setq lsp-haskell-formatting-provider "ormolu")
-
-;; Use 'cabal-fmt' for .cabal files
-(set-formatter! 'cabal-fmt "cabal-fmt"
- :modes 'haskell-cabal-mode)
-
-;; TODO How to organize formatters? brittany is default, and switching using
-;; config updates is annoying. Also, tools are not picked up from nix-shells
-
-;; Use 'ormolu' as formatter.
-(set-formatter! 'ormolu "ormolu"
-  :modes 'haskell-mode
-  :filter
-  (lambda (output errput)
-    (list output
-          (replace-regexp-in-string "Loaded config from:[^\n]*\n*" "" errput))))
-
-;; Use 'stylish-haskell' as formatter.
-;;
-;; NOTE Call stylish-haskell directly instead of the
-;; 'haskell-mode-stylish-buffer command as I am still a bit puzzled why the
-;; latter does not pick up the projects .stylish-haskell.yaml.
-;; (set-formatter! 'stylish-haskell "stylish-haskell"
-;;   :modes 'haskell-mode)
-
-;; NOTE End - Haskell fixes
 
 ;; NOTE Begin - Daemon fixes
 (eval-after-load "workspaces"
@@ -182,180 +141,11 @@
       (run-at-time 0.1 nil #'+workspace/display)))))
 ;; NOTE End - Daemon fixes
 
-;; from https://github.com/idris-community/idris2-mode
-(add-load-path! "~/.emacs.d/idris2-mode/")
-(require 'idris2-mode)
-
-;; Fixes lag when editing idris code with evil
-(defun ~/evil-motion-range--wrapper (fn &rest args)
-  "Like `evil-motion-range', but override field-beginning for performance.
-See URL `https://github.com/ProofGeneral/PG/issues/427'."
-  (cl-letf (((symbol-function 'field-beginning)
-             (lambda (&rest args) 1)))
-    (apply fn args)))
-(advice-add #'evil-motion-range :around #'~/evil-motion-range--wrapper)
-
-;; text modes
-(defun nolinum (&optional arg)
-  (setq display-line-numbers nil))
-
-(defun txt-mode (&optional arg)
-  (nolinum)
-  (visual-fill-column-mode)
-  (variable-pitch-mode))
-
-(setq markdown-bullets-bullet-list '("•" "∴" "∵" "⁘" "⁙")
-      markdown-header-scaling t
-      markdown-command "markdown | smartypants")
-
-(add-hook!    '(markdown-mode-hook)               '(markdown-bullets-mode))
-(add-hook!    '(markdown-mode-hook org-mode-hook) '(nolinum visual-fill-column-mode valign-mode))
-;; (add-hook!    '(markdown-mode-hook org-mode-hook) '(nolinum visual-fill-column-mode variable-pitch-mode valign-mode))
-
-(setq-default visual-fill-column-center-text t)
-
-(add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
-(add-to-list 'auto-mode-alist '("\\.mdx\\'" . gfm-mode))
-;; (add-to-list 'auto-minor-mode-alist '("\\.txt\\'" . txt-mode))
-
 (setq vterm-clear-scrollback-when-clearing t)
-
-(require 'pdf-tools)
-(use-package pdf-occur
-    :commands (pdf-occur-global-minor-mode))
-(use-package pdf-history
-  :commands (pdf-history-minor-mode))
-(use-package pdf-links
-  :commands (pdf-links-minor-mode))
-(use-package pdf-outline
-  :commands (pdf-outline-minor-mode))
-(use-package pdf-annot
-  :commands (pdf-annot-minor-mode))
-(use-package pdf-sync
-  :commands (pdf-sync-minor-mode))
-
-(use-package! pdf-tools
-  :mode ("\\.pdf\\'" . pdf-view-mode)
-  :magic ("%PDF" . pdf-view-mode)
-  :init
-  (after! pdf-annot
-    (defun +pdf-cleanup-windows-h ()
-      "Kill left-over annotation buffers when the document is killed."
-      (when (buffer-live-p pdf-annot-list-document-buffer)
-        (pdf-info-close pdf-annot-list-document-buffer))
-      (when (buffer-live-p pdf-annot-list-buffer)
-        (kill-buffer pdf-annot-list-buffer))
-      (let ((contents-buffer (get-buffer "*Contents*")))
-        (when (and contents-buffer (buffer-live-p contents-buffer))
-          (kill-buffer contents-buffer))))
-    (add-hook! 'pdf-view-mode-hook
-      (add-hook 'kill-buffer-hook #'+pdf-cleanup-windows-h nil t)))
-
-  :config
-  ;; (defadvice! +pdf--install-epdfinfo-a (fn &rest args)
-  ;;   "Install epdfinfo after the first PDF file, if needed."
-  ;;   :around #'pdf-view-mode
-  ;;   (if (and (require 'pdf-info nil t)
-  ;;            (or (pdf-info-running-p)
-  ;;                (ignore-errors (pdf-info-check-epdfinfo) t)))
-  ;;       (apply fn args)
-  ;;     ;; If we remain in pdf-view-mode, it'll spit out cryptic errors. This
-  ;;     ;; graceful failure is better UX.
-  ;;     (fundamental-mode)
-  ;;     (message "Viewing PDFs in Emacs requires epdfinfo. Use `M-x pdf-tools-install' to build it")))
-
-  ;; Despite its namesake, this does not call `pdf-tools-install', it only sets
-  ;; up hooks, auto-mode-alist/magic-mode-alist entries, global modes, and
-  ;; refreshes pdf-view-mode buffers, if any.
-  ;;
-  ;; I avoid calling `pdf-tools-install' directly because `pdf-tools' is easy to
-  ;; prematurely load in the background (e.g. when exporting an org file or by
-  ;; packages like org-pdftools). And I don't want pdf-tools to suddenly block
-  ;; Emacs and spew out compiler output for a few minutes in those cases. It's
-  ;; abysmal UX. The `pdf-view-mode' advice above works around this with a less
-  ;; cryptic failure message, at least.
-  (pdf-tools-install-noverify)
-
-  ;; For consistency with other special modes
-  (map! :map pdf-view-mode-map :gn "q" #'kill-current-buffer)
-
-  (setq-default pdf-view-display-size 'fit-page)
-  ;; Enable hiDPI support, but at the cost of memory! See politza/pdf-tools#51
-  (setq pdf-view-use-scaling t
-        pdf-view-use-imagemagick nil)
-
-  ;; Handle PDF-tools related popups better
-  (set-popup-rules!
-    '(("^\\*Outline*" :side right :size 40 :select nil)
-      ("^\\*Edit Annotation " :quit nil)
-      ("\\(?:^\\*Contents\\|'s annots\\*$\\)" :ignore t)))
-
-  ;; The mode-line does serve any useful purpose is annotation windows
-  (add-hook 'pdf-annot-list-mode-hook #'hide-mode-line-mode)
-
-  ;; HACK Fix #1107: flickering pdfs when evil-mode is enabled
-  (setq-hook! 'pdf-view-mode-hook evil-normal-state-cursor (list nil))
-
-  ;; HACK Refresh FG/BG for pdfs when `pdf-view-midnight-colors' is changed by a
-  ;;      theme or with `setq!'.
-  ;; TODO PR this upstream?
-  (defun +pdf-reload-midnight-minor-mode-h ()
-    (when pdf-view-midnight-minor-mode
-      (pdf-info-setoptions
-       :render/foreground (car pdf-view-midnight-colors)
-       :render/background (cdr pdf-view-midnight-colors)
-       :render/usecolors t)
-      (pdf-cache-clear-images)
-      (pdf-view-redisplay t)))
-  (put 'pdf-view-midnight-colors 'custom-set
-       (lambda (sym value)
-         (set-default sym value)
-         (dolist (buffer (doom-buffers-in-mode 'pdf-view-mode))
-           (with-current-buffer buffer
-             (if (get-buffer-window buffer)
-                 (+pdf-reload-midnight-minor-mode-h)
-               ;; Defer refresh for buffers that aren't visible, to avoid
-               ;; blocking Emacs for too long while changing themes.
-               (add-hook 'doom-switch-buffer-hook #'+pdf-reload-midnight-minor-mode-h
-                         nil 'local))))))
-
-  ;; Silence "File *.pdf is large (X MiB), really open?" prompts for pdfs
-  (defadvice! +pdf-suppress-large-file-prompts-a (fn size op-type filename &optional offer-raw)
-    :around #'abort-if-file-too-large
-    (unless (string-match-p "\\.pdf\\'" filename)
-      (funcall fn size op-type filename offer-raw))))
-
-(use-package! saveplace-pdf-view
-  :after pdf-view)
-
-(setq-default TeX-master 'shared)
-
-(setq TeX-view-program-selection '((output-pdf "Zathura"))
-      TeX-source-correlate-start-server t)
-
-(add-hook 'TeX-after-compilation-finished-functions
-          #'TeX-revert-document-buffer)
-
-(add-hook 'LaTeX-mode-hook
-  (lambda ()
-    (add-hook 'after-save-hook
-     (lambda () (TeX-command "LatexMk" #'TeX-master-file)))))
 
 ;; (require 'pdf-continuous-scroll-mode)
 ;; (setq pdf-continuous-suppress-introduction t)
 (setq which-key-allow-imprecise-window-fit nil)
-
-(defvar markdown-bullets--keywords
-  '(("^\\(#+\\) "
-     (1 (prog1 nil
-          (let* ((beg (match-beginning 1))
-                 (end (match-end 1)))
-                 ;; (end-1 (1- end)))
-            ;; ### Heading 3
-            ;;   ✸
-            (compose-region beg end (markdown-bullets--level-char (- end beg)))))))))
-            ;; (compose-region end-1 end (markdown-bullets--level-char (- end beg)))
-            ;; (compose-region beg end-1 (string-to-char " "))))))))
 
 (setq-default evil-kill-on-visual-paste nil)
 
@@ -372,122 +162,3 @@ See URL `https://github.com/ProofGeneral/PG/issues/427'."
 (map! :n "c" #'evil-change-from-nil)
 (map! :n "C" #'evil-change-line-from-nil)
 (map! :i "C-v" #'yank)
-
-(map! :map 'gfm-mode-map :m "g TAB" 'markdown-up-list)
-
-(setq lsp-enable-suggest-server-download nil)
-
-(setq web-mode-enable-front-matter-block t)
-(define-derived-mode astro-mode web-mode "astro")
-(setq auto-mode-alist
-      (append '((".*\\.astro\\'" . astro-mode))
-              auto-mode-alist))
-
-;;   (lsp-register-client
-;;    (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls" "--stdio"))
-;;                     :activation-fn (lsp-activate-on "astro")
-;;                     :server-id 'astro-ls)))
-
-(require 'lsp-mode)
-
-(add-to-list 'lsp-language-id-configuration
-        '(astro-mode . "astro"))
-
-(defun lsp-astro--get-initialization-options ()
-  "Try to get the typescript server path, to supply to the astro language server."
-  (let ((library (f-join (lsp-workspace-root) "node_modules/typescript/lib/tsserverlibrary.js")))
-    (if (file-exists-p library)
-        `(:typescript (:serverPath ,library))
-      (lsp-warn "Unable to find typescript server path for astro-ls. Guessed: %s" library))))
-
-(defgroup lsp-astro nil
-  "LSP support for Astro.build, using astro-ls."
-  :group 'lsp-mode
-  :link '(url-link "https://github.com/withastro/language-tools"))
-
-(lsp-register-client
- (make-lsp-client :new-connection (lsp-stdio-connection '("astro-ls" "--stdio"))
-                  :activation-fn (lsp-activate-on "astro")
-                  :initialization-options #'lsp-astro--get-initialization-options
-                  :server-id 'astro-ls))
-
-
-
-(lsp-consistency-check lsp-astro)
-
-(add-hook 'astro-mode-hook #'lsp-deferred)
-
-;; accept completion from copilot and fallback to company
-(use-package! copilot
-  :hook (prog-mode . copilot-mode)
-  :bind (("C-TAB" . 'copilot-accept-completion-by-word)
-         ("C-<tab>" . 'copilot-accept-completion-by-word)
-         :map copilot-completion-map
-         ("<tab>" . 'copilot-accept-completion)
-         ("TAB" . 'copilot-accept-completion)))
-
-(after! company
-    (define-key company-active-map (kbd "TAB") nil)
-    (define-key company-active-map (kbd "<tab>") nil)
-    (define-key company-active-map (kbd "<backtab>") nil))
-
-(add-hook 'prog-mode-hook 'ligature-mode)
-
-(after! ligature
-  ;; Enable all Cascadia and Fira Code ligatures in programming modes
-  (ligature-set-ligatures 'prog-mode
-                        '(;; == === ==== => =| =>>=>=|=>==>> ==< =/=//=// =~
-                          ;; =:= =!=
-                          ("=" (rx (+ (or ">" "<" "|" "/" "~" ":" "!" "="))))
-                          ;; ;; ;;;
-                          (";" (rx (+ ";")))
-                          ;; && &&&
-                          ("&" (rx (+ "&")))
-                          ;; !! !!! !. !: !!. != !== !~
-                          ("!" (rx (+ (or "=" "!" "\." ":" "~"))))
-                          ;; ?? ??? ?:  ?=  ?.
-                          ("?" (rx (or ":" "=" "\." (+ "?"))))
-                          ;; %% %%%
-                          ("%" (rx (+ "%")))
-                          ;; |> ||> |||> ||||> |] |} || ||| |-> ||-||
-                          ;; |->>-||-<<-| |- |== ||=||
-                          ;; |==>>==<<==<=>==//==/=!==:===>
-                          ("|" (rx (+ (or ">" "<" "|" "/" ":" "!" "}" "\]"
-                                          "-" "="))))
-                          ;; \\ \\\ \/
-                          ("\\" (rx (or "/" (+ "\\"))))
-                          ;; ++ +++ ++++ +>
-                          ("+" (rx (or ">" (+ "+"))))
-                          ;; :: ::: :::: :> :< := :// ::=
-                          (":" (rx (or ">" "<" "=" "//" ":=" (+ ":"))))
-                          ;; // /// //// /\ /* /> /===:===!=//===>>==>==/
-                          ("/" (rx (+ (or ">"  "<" "|" "/" "\\" "\*" ":" "!"
-                                          "="))))
-                          ;; .. ... .... .= .- .? ..= ..<
-                          ("\." (rx (or "=" "-" "\?" "\.=" "\.<" (+ "\."))))
-                          ;; -- --- ---- -~ -> ->> -| -|->-->>->--<<-|
-                          ("-" (rx (+ (or ">" "<" "|" "~" "-"))))
-                          ;; *> */ *)  ** *** ****
-                          ("*" (rx (or ">" "/" ")" (+ "*"))))
-                          ;; www wwww
-                          ("w" (rx (+ "w")))
-                          ;; <> <!-- <|> <: <~ <~> <~~ <+ <* <$ </  <+> <*>
-                          ;; <$> </> <|  <||  <||| <|||| <- <-| <-<<-|-> <->>
-                          ;; <<-> <= <=> <<==<<==>=|=>==/==//=!==:=>
-                          ;; << <<< <<<<
-                          ("<" (rx (+ (or "\+" "\*" "\$" "<" ">" ":" "~"  "!"
-                                          "-"  "/" "|" "="))))
-                          ;; >: >- >>- >--|-> >>-|-> >= >== >>== >=|=:=>>
-                          ;; >> >>> >>>>
-                          (">" (rx (+ (or ">" "<" "|" "/" ":" "=" "-"))))
-                          ;; #: #= #! #( #? #[ #{ #_ #_( ## ### #####
-                          ("#" (rx (or ":" "=" "!" "(" "\?" "\[" "{" "_(" "_"
-                                       (+ "#"))))
-                          ;; ~~ ~~~ ~=  ~-  ~@ ~> ~~>
-                          ("~" (rx (or ">" "=" "-" "@" "~>" (+ "~"))))
-                          ;; __ ___ ____ _|_ __|____|_
-                          ("_" (rx (+ (or "_" "|"))))
-                          ;; Fira code: 0xFF 0x12
-                          ("0" (rx (and "x" (+ (in "A-F" "a-f" "0-9")))))
-                          ;; The few not covered by the regexps.
-                          "{|"  "[|"  "]#"  "(*"  "}#"  "$>"  "^=")))

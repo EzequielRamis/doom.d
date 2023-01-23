@@ -64,3 +64,6 @@
   :recipe (:host github :repo "zerolfx/copilot.el" :files ("*.el" "dist")))
 
 (package! ligature :recipe (:host github :repo "mickeynp/ligature.el"))
+
+(package! lsp-mode :pin "dc0b2e6b1549")
+(package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
