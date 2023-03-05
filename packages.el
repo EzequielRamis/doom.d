@@ -67,3 +67,5 @@
 
 (package! lsp-mode :pin "dc0b2e6b1549")
 (package! lsp-tailwindcss :recipe (:host github :repo "merrickluo/lsp-tailwindcss"))
+
+(package! file-info :recipe (:host github :repo "artawower/file-info.el"))

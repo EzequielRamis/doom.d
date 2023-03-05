@@ -59,6 +59,18 @@
 
   ((lsp-face-highlight-textual :background base2 :foreground fg-alt :distant-background bg-alt)
    (cursor :background blue)
+
+   (doom-modeline-evil-emacs-state    :background magenta :weight 'bold :foreground bg)
+   (doom-modeline-evil-normal-state   :background green   :weight 'bold :foreground bg)
+   (doom-modeline-evil-visual-state   :background yellow  :weight 'bold :foreground bg)
+   (doom-modeline-evil-insert-state   :background blue    :weight 'bold :foreground bg)
+   (doom-modeline-evil-motion-state   :background orange  :weight 'bold :foreground bg)
+   (doom-modeline-evil-replace-state  :background red     :weight 'bold :foreground bg)
+   (doom-modeline-evil-operator-state :background cyan    :weight 'bold :foreground bg)
+
+   (doom-modeline-bar          :background bg)
+   (doom-modeline-bar-inactive :background bg)
+
    (diff-removed                    :foreground red :background palette1F)
    (diff-indicator-removed          :foreground red :background palette1E)
    (magit-diff-removed              :foreground red :background palette1F)
@@ -95,4 +107,6 @@
    (org-tag                          :inherit 'fixed-pitch :foreground doc-comments)
    (org-tag-group                    :inherit 'fixed-pitch :foreground doc-comments)
    (line-number                      :foreground base4)
-   (line-number-current-line         :foreground fg)))
+   (line-number-current-line         :foreground fg)
+   (file-info-properties-face        :foreground cyan)
+   (file-info-bind-face              :foreground teal)))

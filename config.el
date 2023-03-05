@@ -113,6 +113,8 @@
 (load! "markdown")
 (load! "web")
 (load! "pdf")
+(load! "info")
+(load! "modeline")
 
 ;; NOTE Begin - Treemacs icons fix
 (setq doom-themes-treemacs-theme "doom-colors")
@@ -162,3 +164,7 @@
 (map! :n "c" #'evil-change-from-nil)
 (map! :n "C" #'evil-change-line-from-nil)
 (map! :i "C-v" #'yank)
+
+(global-auto-revert-mode t)
+(setq auto-revert-interval 0.5)
+(setq auto-revert-use-notify t)
