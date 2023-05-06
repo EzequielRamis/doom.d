@@ -165,6 +165,11 @@
 (map! :n "C" #'evil-change-line-from-nil)
 (map! :i "C-v" #'yank)
 
+(map! :im "C-z" nil)
+
 (global-auto-revert-mode t)
 (setq auto-revert-interval 0.5)
 (setq auto-revert-use-notify t)
+
+
+

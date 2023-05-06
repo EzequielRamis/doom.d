@@ -19,8 +19,10 @@
 
 (setq-default visual-fill-column-center-text t)
 
+(define-derived-mode mdx-mode gfm-mode "MDX")
+
 (add-to-list 'auto-mode-alist '("\\.md\\'" . gfm-mode))
-(add-to-list 'auto-mode-alist '("\\.mdx\\'" . gfm-mode))
+(add-to-list 'auto-mode-alist '("\\.mdx\\'" . mdx-mode))
 ;; (add-to-list 'auto-minor-mode-alist '("\\.txt\\'" . txt-mode))
 
 (defvar markdown-bullets--keywords
@@ -36,3 +38,9 @@
             ;; (compose-region beg end-1 (string-to-char " "))))))))
 
 (map! :map 'gfm-mode-map :m "g TAB" 'markdown-up-list)
+
+(add-hook 'mdx-mode-hook
+  (lambda ()
+    ;; Preferred comment style
+    (setq comment-start "{/* "
+          comment-end " */}")))

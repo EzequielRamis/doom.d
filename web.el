@@ -23,3 +23,9 @@
 (setq lsp-css-lint-unknown-at-rules "ignore")
 (lsp-register-custom-settings
  '(("scss.lint.unknownAtRules" "ignore")))
+
+(add-hook 'typescript-tsx-mode-hook
+  (lambda ()
+    ;; Preferred comment style
+    (setq comment-start "// "
+          comment-end "")))
