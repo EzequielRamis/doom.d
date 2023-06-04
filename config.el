@@ -171,5 +171,16 @@
 (setq auto-revert-interval 0.5)
 (setq auto-revert-use-notify t)
 
+(setq
+ lsp-lens-enable t
+ ;; lsp-headerline-breadcrumb-enable t
+ ;; lsp-headerline-breadcrumb-icons-enable t
+ lsp-ui-sideline-enable t
+ lsp-ui-sideline-show-diagnostics t)
 
+(setq +lsp-company-backends '(:separate company-capf))
 
+(after! flycheck
+  (map! :leader
+        (:prefix-map ("c" . "code")
+         "x" flycheck-command-map)))
