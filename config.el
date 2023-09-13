@@ -23,12 +23,9 @@
       doom-emoji-fallback-font-families '("Twitter Color Emoji")
       doom-variable-pitch-font (font-spec :family "sans" :size 20))
 
-;; There are two ways to load a theme. Both assume the theme is installed and
-;; available. You can either set `doom-theme' or manually load a theme with the
-;; `load-theme' function. This is the default:
 (defun theme-is-dark-p ()
-  (car (read-from-string
-        (shell-command-to-string "theme_is_dark && echo -n t || echo -n nil"))))
+ (car (read-from-string
+       (shell-command-to-string "theme_is_dark && echo -n t || echo -n nil"))))
 
 (defun sync-theme-light ()
   (setq doom-theme 'mylight)
@@ -39,12 +36,18 @@
 
 (add-load-path! "~/.local/share/dotfiles")
 (require 'dash)
-(if (and (-contains-p (custom-available-themes) 'mydark)
-         (-contains-p (custom-available-themes) 'mylight))
-  (if (theme-is-dark-p)
-    (setq doom-theme 'mydark)
-    (setq doom-theme 'mylight))
- (setq doom-theme 'doom-one))
+(if (theme-is-dark-p)
+  (setq doom-theme 'mydark)
+  (setq doom-theme 'mylight))
+
+(add-hook 'after-make-frame-functions
+            (lambda (frame)
+              (with-selected-frame frame
+                (if (boundp 'doom-theme)
+                   (if (theme-is-dark-p)
+                     (load-theme 'mydark t)
+                     (load-theme 'mylight t))
+                   (load-theme 'doom-theme t)))))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -184,3 +187,12 @@
   (map! :leader
         (:prefix-map ("c" . "code")
          "x" flycheck-command-map)))
+
+(setq mouse-wheel-progressive-speed nil)
+
+(defun wrap-diff ()
+  "Disable `truncate-lines' in the current buffer."
+  (setq truncate-lines nil))
+
+(add-hook 'magit-mode-hook #'wrap-diff)
+(add-hook 'magit-diff-mode-hook #'wrap-diff)

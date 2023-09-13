@@ -109,4 +109,7 @@
    (line-number                      :foreground base4)
    (line-number-current-line         :foreground fg)
    (file-info-properties-face        :foreground cyan)
-   (file-info-bind-face              :foreground teal)))
+   (file-info-bind-face              :foreground teal)
+
+   (tree-sitter-hl-face:property     :foreground violet)
+   (tree-sitter-hl-face:number       :foreground orange)))

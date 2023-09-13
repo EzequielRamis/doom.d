@@ -3,7 +3,7 @@
 (setq web-mode-enable-front-matter-block t)
 (define-derived-mode astro-mode web-mode "Astro")
 (setq auto-mode-alist
-      (append '((".*\\.astro\\'" . astro-mode))
+      (append '(("\\.astro\\'" . astro-mode))
               auto-mode-alist))
 
 (after! lsp-mode
