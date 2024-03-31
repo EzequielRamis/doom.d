@@ -10,8 +10,14 @@
          ("TAB" . 'copilot-accept-completion)))
 
 (after! company
-    (define-key company-active-map (kbd "TAB") nil)
-    (define-key company-active-map (kbd "<tab>") nil)
-    (define-key company-active-map (kbd "<backtab>") nil))
+  (define-key company-active-map (kbd "TAB") nil)
+  (define-key company-active-map (kbd "<tab>") nil)
+  (define-key company-active-map (kbd "<backtab>") nil))
 
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
+
+(after! zig-mode (add-to-list
+                  'copilot-indentation-alist
+                  '(zig-mode zig-indent-offset)))
+
+(after! zig-mode (setq zig-format-on-save nil))

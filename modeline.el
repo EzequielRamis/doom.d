@@ -34,7 +34,7 @@ Including `evil', `overwrite', `god', `ryo' and `xha-fly-kyes', etc."
 
   (doom-modeline-def-modeline 'main
         '(modals follow buffer-info remote-host buffer-position word-count parrot selection-info)
-        '(bar compilation objed-state misc-info persp-name battery grip irc mu4e gnus github debug repl lsp minor-modes input-method indent-info buffer-encoding major-mode process vcs checker time))
+        '(bar compilation objed-state misc-info persp-name battery grip irc mu4e gnus github debug repl lsp minor-modes input-method indent-info buffer-encoding major-mode process vcs check time))
 
   (doom-modeline-def-modeline 'minimal
         '(matches buffer-info-simple)
@@ -78,7 +78,7 @@ Including `evil', `overwrite', `god', `ryo' and `xha-fly-kyes', etc."
 
   (doom-modeline-def-modeline 'org-src
         '(modals matches buffer-info buffer-position word-count parrot selection-info)
-        '(bar compilation objed-state misc-info debug lsp minor-modes input-method indent-info buffer-encoding major-mode process checker time))
+        '(bar compilation objed-state misc-info debug lsp minor-modes input-method indent-info buffer-encoding major-mode process check time))
 
   (doom-modeline-def-modeline 'helm
         '(helm-buffer-id helm-number helm-follow helm-prefix-argument)

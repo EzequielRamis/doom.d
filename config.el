@@ -24,8 +24,8 @@
       doom-variable-pitch-font (font-spec :family "sans" :size 20))
 
 (defun theme-is-dark-p ()
- (car (read-from-string
-       (shell-command-to-string "theme_is_dark && echo -n t || echo -n nil"))))
+  (car (read-from-string
+        (shell-command-to-string "theme_is_dark && echo -n t || echo -n nil"))))
 
 (defun sync-theme-light ()
   (setq doom-theme 'mylight)
@@ -37,17 +37,17 @@
 (add-load-path! "~/.local/share/dotfiles")
 (require 'dash)
 (if (theme-is-dark-p)
-  (setq doom-theme 'mydark)
+    (setq doom-theme 'mydark)
   (setq doom-theme 'mylight))
 
 (add-hook 'after-make-frame-functions
-            (lambda (frame)
-              (with-selected-frame frame
-                (if (boundp 'doom-theme)
-                   (if (theme-is-dark-p)
-                     (load-theme 'mydark t)
-                     (load-theme 'mylight t))
-                   (load-theme 'doom-theme t)))))
+          (lambda (frame)
+            (with-selected-frame frame
+              (if (boundp 'doom-theme)
+                  (if (theme-is-dark-p)
+                      (load-theme 'mydark t)
+                    (load-theme 'mylight t))
+                (load-theme 'doom-theme t)))))
 
 ;; If you use `org' and don't want your org files in the default location below,
 ;; change `org-directory'. It must be set before org loads!
@@ -109,7 +109,7 @@
 
 (setq lsp-enable-suggest-server-download nil)
 
-(load! "haskell")
+;; (load! "haskell")
 (load! "idris")
 (load! "ligatures")
 (load! "copilot")
@@ -129,21 +129,21 @@
 
 ;; NOTE Begin - Daemon fixes
 (eval-after-load "workspaces"
- '(defun +workspaces-associate-frame-fn (frame &optional _new-frame-p)
-   "Create a blank, new perspective and associate it with FRAME."
-   (when persp-mode
-     (if (not (persp-frame-list-without-daemon))
-      (+workspace-switch +workspaces-main t)
-      (with-selected-frame frame
-        (print (car (+workspace-list-names)))
-        ;; (+workspace-switch (format "#%s" (+workspace--generate-id)) t)
-        (+workspace-switch (car (+workspace-list-names)) t)
-        (unless (doom-real-buffer-p (current-buffer))
-          (switch-to-buffer (doom-fallback-buffer)))
-        (set-frame-parameter frame 'workspace (+workspace-current-name))
-        ;; ensure every buffer has a buffer-predicate
-        (persp-set-frame-buffer-predicate frame))
-      (run-at-time 0.1 nil #'+workspace/display)))))
+  '(defun +workspaces-associate-frame-fn (frame &optional _new-frame-p)
+     "Create a blank, new perspective and associate it with FRAME."
+     (when persp-mode
+       (if (not (persp-frame-list-without-daemon))
+           (+workspace-switch +workspaces-main t)
+         (with-selected-frame frame
+           (print (car (+workspace-list-names)))
+           ;; (+workspace-switch (format "#%s" (+workspace--generate-id)) t)
+           (+workspace-switch (car (+workspace-list-names)) t)
+           (unless (doom-real-buffer-p (current-buffer))
+             (switch-to-buffer (doom-fallback-buffer)))
+           (set-frame-parameter frame 'workspace (+workspace-current-name))
+           ;; ensure every buffer has a buffer-predicate
+           (persp-set-frame-buffer-predicate frame))
+         (run-at-time 0.1 nil #'+workspace/display)))))
 ;; NOTE End - Daemon fixes
 
 (setq vterm-clear-scrollback-when-clearing t)
@@ -186,7 +186,7 @@
 (after! flycheck
   (map! :leader
         (:prefix-map ("c" . "code")
-         "x" flycheck-command-map)))
+                     "x" flycheck-command-map)))
 
 (setq mouse-wheel-progressive-speed nil)
 
