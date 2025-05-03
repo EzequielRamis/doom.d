@@ -20,6 +20,7 @@
 ;; They all accept either a font-spec, font string ("Input Mono-12"), or xlfd
 ;; font string. You generally only need these two:
 (setq doom-font (font-spec :family "LigaSF Mono Nerd Font" :size 18)
+      doom-symbol-fallback-font-families '("Fira Code")
       doom-emoji-fallback-font-families '("Twitter Color Emoji")
       doom-variable-pitch-font (font-spec :family "sans" :size 20))
 
@@ -109,6 +110,10 @@
 
 (setq lsp-enable-suggest-server-download nil)
 
+(use-package tree-sitter-langs
+  :ensure t
+  :after tree-sitter)
+
 ;; (load! "haskell")
 (load! "idris")
 (load! "ligatures")
@@ -196,3 +201,18 @@
 
 (add-hook 'magit-mode-hook #'wrap-diff)
 (add-hook 'magit-diff-mode-hook #'wrap-diff)
+
+(setq flycheck-indication-mode nil)
+
+(set-fringe-mode 4)
+
+(advice-add 'set-window-vscroll :after
+            (defun me/vterm-toggle-scroll (&rest _)
+              (when (eq major-mode 'vterm-mode)
+                (if (> (window-end) (buffer-size))
+                    (when vterm-copy-mode (vterm-copy-mode-done nil))
+                  (vterm-copy-mode 1)))))
+
+(setq TeX-command-extra-options "-shell-escape")
+
+(pinentry-start)

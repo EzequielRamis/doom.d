@@ -16,8 +16,8 @@
 
 (remove-hook 'doom-first-buffer-hook #'smartparens-global-mode)
 
-(after! zig-mode (add-to-list
-                  'copilot-indentation-alist
-                  '(zig-mode zig-indent-offset)))
+;; (after! zig-mode (add-to-list))
+;; 'copilot-indentation-alist
+;; '(zig-mode zig-indent-offset)))
 
 (after! zig-mode (setq zig-format-on-save nil))
