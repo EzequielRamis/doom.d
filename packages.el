@@ -74,3 +74,7 @@
 (package! pinentry)
 
 (package! typst-ts-mode :recipe (:host codeberg :repo "meow_king/typst-ts-mode"))
+
+(package! flymake-hledger :recipe (:host github :repo "DamienCassou/flymake-hledger"))
+
+(package! typst-ts-mode :recipe (:host nil :repo "https://git.sr.ht/~meow_king/typst-ts-mode"))
